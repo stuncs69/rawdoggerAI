@@ -1,16 +1,21 @@
 import { Server } from "./networking";
-import readline from "readline";
+import * as WS from 'ws';
+import fs from "fs"
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+const port = JSON.parse(String(fs.readFileSync("./config.json")))["port"] as number
+
+interface Piece {
+    piece: any
+}
+
+interface Message {
+    logId: number,
+    // 0 for white, 1 for black
+    player: boolean,
+    // 8 An array for horizontal rows, containing arrays for vertical rows containing Pieces
+    board: Array<Array<Piece>>
+}
+
+const host: Server = new Server(port, (data: Message, socket: WS.WebSocket) => {
+    
 })
-
-let port: number = 8080
-
-rl.question("Please be so kind to input the desired port on which the bot shall be run on: ", (ans: string) => {
-    port = parseInt(ans)
-    rl.close()
-})
-
-const host: Server = new Server(port)

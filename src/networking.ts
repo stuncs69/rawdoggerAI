@@ -31,9 +31,11 @@ export class Server {
     //@ts-ignore
     socket: WS.WebSocket
     log: Logger
+    callbackfn: Function
     latestData: Data
 
-    constructor(port: number) {
+    constructor(port: number, callback: Function) {
+        this.callbackfn = callback
         this.latestData = {
             footprint: "NULL",
             data: {}
@@ -49,8 +51,7 @@ export class Server {
             this.socket = WebSocket
             this.log.generic("New Connection")
             this.socket.on("message", (rawData: string) => {
-                let channel = JSON.parse(rawData)[0]
-                let data = JSON.parse(rawData)[1]
+                this.callbackfn(JSON.parse(rawData), this.socket)
             })
         })
         this.server.on("close", () => {
@@ -59,7 +60,7 @@ export class Server {
 
 
         server.listen(this.port || 8080, () => {
-            this.log.warn("STARTED SERVER")
+            this.log.warn(`STARTED SERVER ON ${this.port}`)
         })
         
 
