@@ -1,2 +1,3 @@
-![capybara](https://cdn.britannica.com/79/191679-050-C7114D2B/Adult-capybara.jpg)
-# Placeholder readme
+![Discord](https://img.shields.io/discord/1051817924052144190) ![GitHub](https://img.shields.io/github/license/stuncs69/rawdoggerAI) ![GitHub issues](https://img.shields.io/github/issues-raw/stuncs69/rawdoggerAI) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?logo=typescript&logoColor=white)
+# rawdoggerAI
+a bot that is very terrible at chess. if you manage to lose from this you should consider quitting
