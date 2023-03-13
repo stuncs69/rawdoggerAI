@@ -1,25 +1,31 @@
 export interface Pawn {
     player: boolean
+    identifier: string
 }
 
 export interface Rook {
     player: boolean
+    identifier: string
 }
 
 export interface Knight {
     player: boolean
+    identifier: string
 }
 
 export interface Queen {
     player: boolean
+    identifier: string
 }
 
 export interface King {
     player: boolean
+    identifier: string
 }
 
 export interface Bishop {
     player: boolean
+    identifier: string
 }
 
 export interface Empty {

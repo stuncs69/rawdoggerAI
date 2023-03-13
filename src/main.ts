@@ -7,4 +7,4 @@ const port = JSON.parse(String(fs.readFileSync("./config.json")))["port"] as num
 
 const host: Server = new Server(port, (data: tps.Message, socket: WS.WebSocket) => {
     
-})
+})  
