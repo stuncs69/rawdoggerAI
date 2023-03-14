@@ -1,18 +1,20 @@
-import * as ts from './types'
+import * as ts from "./types";
 
-export function parseBoard(rawBoard: Array<Array<string>>): Array<Array<ts.Piece>> {
-    let parsedBoard: any = []
+export function parseBoard(
+    rawBoard: Array<Array<string>>
+): Array<Array<ts.Piece>> {
+    let parsedBoard: any = [];
     rawBoard.forEach((verticalRow: Array<String>, index: number) => {
-        parsedBoard[index] = []
+        parsedBoard[index] = [];
         verticalRow.forEach((rawPiece: String, pieceIndex: number) => {
             let user: boolean;
             switch (rawPiece.startsWith("w")) {
                 case true:
-                    user = true
+                    user = true;
                     break;
-            
+
                 default:
-                    user = false
+                    user = false;
                     break;
             }
 
@@ -21,7 +23,7 @@ export function parseBoard(rawBoard: Array<Array<string>>): Array<Array<ts.Piece
                     // Pawn
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "pawn"
+                        identifier: "pawn",
                     } as ts.Pawn;
                     break;
 
@@ -29,7 +31,7 @@ export function parseBoard(rawBoard: Array<Array<string>>): Array<Array<ts.Piece
                     // Rook
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "rook"
+                        identifier: "rook",
                     } as ts.Rook;
                     break;
 
@@ -37,7 +39,7 @@ export function parseBoard(rawBoard: Array<Array<string>>): Array<Array<ts.Piece
                     // Bishop
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "bishop"
+                        identifier: "bishop",
                     } as ts.Bishop;
                     break;
 
@@ -45,31 +47,30 @@ export function parseBoard(rawBoard: Array<Array<string>>): Array<Array<ts.Piece
                     // Knight
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "knight"
+                        identifier: "knight",
                     } as ts.Knight;
                     break;
-                
+
                 case "q":
                     // Queen
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "queen"
+                        identifier: "queen",
                     } as ts.Queen;
                     break;
-                
+
                 case "k":
                     // King
                     parsedBoard[index][pieceIndex] = {
                         player: user,
-                        identifier: "king"
+                        identifier: "king",
                     } as ts.King;
                     break;
                 default:
                     parsedBoard[index][pieceIndex] = {} as ts.Empty;
                     break;
             }
-
-        })
-    })
-    return parsedBoard as Array<Array<ts.Piece>>
+        });
+    });
+    return parsedBoard as Array<Array<ts.Piece>>;
 }
