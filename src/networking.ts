@@ -51,7 +51,7 @@ export class Server {
             this.socket = WebSocket
             this.log.generic("New Connection")
             this.socket.on("message", (rawData: string) => {
-                this.callbackfn(rawData, this.socket)
+                this.callbackfn(JSON.parse(rawData), this.socket)
             })
         })
         this.server.on("close", () => {

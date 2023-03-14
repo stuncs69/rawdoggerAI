@@ -41,5 +41,5 @@ export interface Message {
     // 0 for white, 1 for black
     player: boolean,
     // 8 An array for horizontal rows, containing arrays for vertical rows containing Pieces
-    board: Array<Array<Piece>>
+    board: Array<Array<String>>
 }

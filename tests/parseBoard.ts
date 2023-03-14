@@ -11,5 +11,10 @@ board.forEach((array: any) => {
     }
 })
 
-console.log(board);
-console.log(parseBoard(board))
+console.log(typeof board);
+
+board.forEach(arr => {
+    arr.forEach(piece => {
+        console.log(typeof piece)
+    })
+})
