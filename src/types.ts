@@ -1,45 +1,30 @@
-export interface Pawn {
+export interface BasePiece {
     player: boolean;
     identifier: string;
 }
 
-export interface Rook {
-    player: boolean;
-    identifier: string;
-}
-
-export interface Knight {
-    player: boolean;
-    identifier: string;
-}
-
-export interface Queen {
-    player: boolean;
-    identifier: string;
-}
-
-export interface King {
-    player: boolean;
-    identifier: string;
-}
-
-export interface Bishop {
-    player: boolean;
-    identifier: string;
-}
+export interface Pawn extends BasePiece {}
+export interface Rook extends BasePiece {}
+export interface Knight extends BasePiece {}
+export interface Queen extends BasePiece {}
+export interface King extends BasePiece {}
+export interface Bishop extends BasePiece {}
 
 export interface Empty {
-    // Empty
+    identifier: "empty";
 }
 
-export interface Piece {
-    piece: Pawn | Rook | Knight | Queen | King | Bishop | Empty;
-}
+export type Piece = Pawn | Rook | Knight | Queen | King | Bishop | Empty;
 
 export interface Message {
     logId: number;
-    // 0 for white, 1 for black
     player: boolean;
-    // 8 An array for horizontal rows, containing arrays for vertical rows containing Pieces
-    board: Array<Array<String>>;
+    board: Array<Array<string>>;
+}
+
+export interface Move {
+    from: { row: number; col: number };
+    to: { row: number; col: number };
+    piece: Piece;
+    capturedPiece?: Piece;
 }

@@ -1,79 +1,159 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+    <title>Chess Board</title>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script defer>
-
-let ws = new WebSocket("ws://localhost:5050")
-ws.addEventListener("message", (ev) => {
-    console.log("yes");
-    ev.data.text().then(val => {
-        document.querySelector("p").innerHTML = JSON.parse(val)
-    })
-})  
-
-function sendMessage() {
-    ws.send(JSON.stringify({
-        player: true,
-        logId: 20,
-        board: [
-                    [
-                        'wp', 'wp', 'wk',
-                        'wp', 'bp', 'bp',
-                        'bq', 'bq'
-                    ],
-                    [
-                        'bq',    'wk',
-                        'bp',    'bq',
-                        'wp',    'bq',
-                        'empty', 'wp'
-                    ],
-                    [
-                        'bp', 'bq', 'wk',
-                        'bp', 'bq', 'bp',
-                        'wk', 'bq'
-                    ],
-                    [
-                        'wp',    'empty',
-                        'bq',    'bp',
-                        'wk',    'bq',
-                        'empty', 'wp'
-                    ],
-                    [
-                        'empty', 'bq',
-                        'wk',    'wk',
-                        'bq',    'bq',
-                        'wk',    'wp'
-                    ],
-                    [
-                        'empty', 'empty',
-                        'wp',    'empty',
-                        'wp',    'bq',
-                        'empty', 'wk'
-                    ],
-                    [
-                        'bq', 'bq',
-                        'bq', 'wp',
-                        'wp', 'empty',
-                        'bp', 'wp'
-                    ],
-                    [
-                        'empty', 'bq',
-                        'wp',    'wp',
-                        'bp',    'bp',
-                        'bq',    'empty'
-                    ]
-                ]
-    }))
-}
-
-    </script>
+    <style>
+        .chess-board { border-spacing: 0; border-collapse: collapse; }
+        .chess-board th { padding: .5em; }
+        .chess-board td { width: 1.5em; height: 1.5em; text-align: center; font-size: 32px; cursor: pointer; }
+        .chess-board .light { background: #eee; }
+        .chess-board .dark { background: #aaa; }
+        .dragging { opacity: 0.5; }
+    </style>
 </head>
 <body>
-    <p>null</p>
-    <button onclick="sendMessage()">Send Message</button>
+    <table class="chess-board" id="chess-board">
+        <thead>
+            <tr>
+                <th></th>
+                <th>a</th>
+                <th>b</th>
+                <th>c</th>
+                <th>d</th>
+                <th>e</th>
+                <th>f</th>
+                <th>g</th>
+                <th>h</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <button id="send-test-data">Send Test Data</button>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:5050');
+
+        let boardState = []; // Store the current board state
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.board) {
+                renderBoard(data.board);
+            }
+        };
+
+        function renderBoard(board) {
+            boardState = board; // Update the internal board state
+            const tbody = document.querySelector('#chess-board tbody');
+            tbody.innerHTML = '';  // Clear existing board
+
+            // Loop over the rows and cells in the board array
+            for (let row = 8; row >= 1; row--) {
+                const tr = document.createElement('tr');
+                const th = document.createElement('th');
+                th.textContent = row;
+                tr.appendChild(th);
+
+                for (let col = 0; col < 8; col++) {
+                    const td = document.createElement('td');
+                    const piece = board[row - 1][col];
+
+                    // Assign piece symbols based on the parsed piece
+                    td.textContent = getPieceSymbol(piece);
+                    td.className = ((row + col) % 2 === 0) ? 'dark' : 'light';
+
+                    // Make the pieces draggable
+                    if (piece.identifier && piece.identifier !== "empty") {
+                        td.setAttribute("draggable", "true");
+                        td.addEventListener("dragstart", (event) => {
+                            event.dataTransfer.setData("text/plain", JSON.stringify({ row: row, col: col, piece }));
+                            td.classList.add("dragging");
+                        });
+                        td.addEventListener("dragend", () => {
+                            td.classList.remove("dragging");
+                        });
+                    }
+
+                    // Handle drag over and drop
+                    td.addEventListener("dragover", (event) => {
+                        event.preventDefault();  // Allow dropping
+                    });
+
+                    td.addEventListener("drop", (event) => {
+                        event.preventDefault();  // Prevent default behavior
+                        const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+                        const targetRow = row;
+                        const targetCol = col;
+
+                        // Update the board state and send it to the server
+                        updateBoard(data.row, data.col, targetRow, targetCol);
+                    });
+
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            }
+        }
+
+        function updateBoard(fromRow, fromCol, toRow, toCol) {
+            // Update the internal board state
+            const movedPiece = boardState[fromRow - 1][fromCol];
+            boardState[fromRow - 1][fromCol] = { identifier: "empty" }; // Set the original position to empty
+            boardState[toRow - 1][toCol] = movedPiece; // Move the piece to the new position
+
+            // Send the updated board state to the server in the correct format
+            const message = {
+                logId: 1,
+                player: true,
+                board: boardState.map(row => row.map(piece => {
+                    if (piece.identifier === "empty") {
+                        return ""; // Empty squares are sent as an empty string
+                    }
+                    // Constructing the piece string based on player and identifier
+                    return (piece.player ? 'w' : 'b') + piece.identifier.charAt(0); // Use only the first letter of the identifier
+                }))
+            };
+
+            ws.send(JSON.stringify(message));
+        }
+
+        function getPieceSymbol(piece) {
+            const pieceMap = {
+                pawn: { true: '♙', false: '♟' },
+                rook: { true: '♖', false: '♜' },
+                knight: { true: '♘', false: '♞' },
+                bishop: { true: '♗', false: '♝' },
+                queen: { true: '♕', false: '♛' },
+                king: { true: '♔', false: '♚' },
+                empty: ''
+            };
+
+            return pieceMap[piece.identifier]?.[piece.player] || '';
+        }
+
+        // Test Data
+        const testData = {
+            logId: 1,
+            player: true,
+            board: [
+                ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
+                ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
+                ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"]
+            ]
+        };
+
+        document.getElementById('send-test-data').onclick = () => {
+            ws.send(JSON.stringify(testData));
+        };
+    </script>
 </body>
 </html>

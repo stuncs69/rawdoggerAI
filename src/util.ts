@@ -3,74 +3,50 @@ import * as ts from "./types";
 export function parseBoard(
     rawBoard: Array<Array<string>>
 ): Array<Array<ts.Piece>> {
-    let parsedBoard: any = [];
-    rawBoard.forEach((verticalRow: Array<String>, index: number) => {
-        parsedBoard[index] = [];
-        verticalRow.forEach((rawPiece: String, pieceIndex: number) => {
-            let user: boolean;
-            switch (rawPiece.startsWith("w")) {
-                case true:
-                    user = true;
-                    break;
+    let parsedBoard: Array<Array<ts.Piece>> = [];
 
-                default:
-                    user = false;
-                    break;
-            }
+    rawBoard.forEach((verticalRow: Array<string>, rowIndex: number) => {
+        if (verticalRow.length !== 8) {
+            console.warn(`Row ${rowIndex} does not have 8 pieces:`, verticalRow);
+            return;
+        }
 
-            switch (rawPiece.slice(1)) {
+        parsedBoard[rowIndex] = [];
+
+        verticalRow.forEach((rawPiece: string, pieceIndex: number) => {
+            const user = rawPiece.startsWith("w");
+            const pieceType = rawPiece.slice(1);
+
+            let piece: ts.Piece;
+
+            switch (pieceType) {
                 case "p":
-                    // Pawn
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "pawn",
-                    } as ts.Pawn;
+                    piece = { player: user, identifier: "pawn" } as ts.Pawn;
                     break;
-
                 case "r":
-                    // Rook
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "rook",
-                    } as ts.Rook;
+                    piece = { player: user, identifier: "rook" } as ts.Rook;
                     break;
-
                 case "b":
-                    // Bishop
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "bishop",
-                    } as ts.Bishop;
+                    piece = { player: user, identifier: "bishop" } as ts.Bishop;
                     break;
-
                 case "n":
-                    // Knight
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "knight",
-                    } as ts.Knight;
+                    piece = { player: user, identifier: "knight" } as ts.Knight;
                     break;
-
                 case "q":
-                    // Queen
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "queen",
-                    } as ts.Queen;
+                    piece = { player: user, identifier: "queen" } as ts.Queen;
                     break;
-
                 case "k":
-                    // King
-                    parsedBoard[index][pieceIndex] = {
-                        player: user,
-                        identifier: "king",
-                    } as ts.King;
+                    piece = { player: user, identifier: "king" } as ts.King;
                     break;
+                case "e":
                 default:
-                    parsedBoard[index][pieceIndex] = {} as ts.Empty;
+                    piece = { identifier: "empty" } as ts.Empty;
                     break;
             }
+
+            parsedBoard[rowIndex][pieceIndex] = piece;
         });
     });
-    return parsedBoard as Array<Array<ts.Piece>>;
+
+    return parsedBoard;
 }
